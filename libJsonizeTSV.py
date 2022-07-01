@@ -38,67 +38,76 @@ class jsonizeTSV:
         else:
             return self.content_list
     def read(self):
+        self.print(F"[LOAD] file: \"{self.input_path}\"")
+        input_size_int = os.path.getsize(self.input_path)
+        self.print("- Filesize: \"{}\"".format(self.convert_size(input_size_int)))
         file_lines = [n for n in open(self.input_path).read().splitlines() if n != ""]
         lines_without_hash = [n for n in file_lines if n[0] != "#"]
         lines_with_tab = [n for n in lines_without_hash if "\t" in n]
         return_bool = True
-        self.print(F"load \"{self.input_path}\"")
         if len(lines_with_tab) == 0:
-            self.print("ERROR: Content must more than 0 line")
+            self.print("[ERROR] Content must more than 0 line")
             return_bool = False
         else:
             if self.header_list == list():
                 if len(lines_with_tab) <= 1:
-                    self.print("ERROR: Content with header must more than 1 line")
+                    self.print("[ERROR] Content with header must more than 1 line")
                     return_bool = False
                 else:
                     header_line, *content_lines = lines_with_tab
                     self.header_list.extend(header_line.split("\t"))
                     self.content_list.extend([n.split("\t") for n in content_lines])
             else:
-                self.print("NOTE: use user-provided header list")
+                self.print("[NOTE] use user-provided header list")
                 self.content_list.extend([n.split("\t") for n in lines_with_tab])
         if return_bool:
             if len(self.header_list) != len(set(self.header_list)):
-                self.print("WARN: Duplicated column name in header list")
+                self.print("[WARN] Duplicated column name in header list")
                 self.print(self.deduplicate(self.header_list))
             column_count_set = set([len(n) for n in self.content_list])
             if len(column_count_set) != 1:
-                self.print("WARN: Cell count per line no consistent")
-                self.print("Cell count per line:",column_count_set)
+                self.print("[WARN] Cell count per line no consistent")
+                self.print("- Cell count per line:",column_count_set)
         return return_bool
     def determind(self):
+        self.print("[ANALYSIS] check column and row")
         determind_index_dict = {i:len(set([n[i] for n in self.content_list])) for i in range(len(self.header_list))}
         determind_dict = {self.header_list[x]:x for x,y in determind_index_dict.items() if y == len(self.content_list)}
         determind_list = sorted(list(determind_dict.keys()), key=lambda x : determind_dict[x])
-        self.print("Unique column header: {}".format(determind_list))
+        self.print("- Unique column header: {}".format(determind_list))
         if self.id_str == str():
             if len(determind_list) > 0:
                 determind_str = determind_list[0]
                 determind_int = determind_dict[determind_str]
-                self.print(F"Selected ID: {determind_str}")
+                self.print(F"- Selected ID: {determind_str}")
             else:
                 self.count_bool = True
-                self.print(F"Selected ID: line count")
+                self.print(F"- Selected ID: line count")
         else:
             if self.id_str in self.header_list:
                 if self.id_str not in determind_list:
-                    self.print(F"WARN: some values under {self.id_str} column are duplicated, use line count instead")
+                    self.print(F"[WARN] some values under {self.id_str} column are duplicated, use line count instead")
                     self.count_bool = True
-                    self.print(F"Selected ID: line count")
+                    self.print(F"- Selected ID: line count")
                 determind_int = determind_dict[self.id_str]
-                self.print(F"Selected ID: {self.id_str}")
+                self.print(F"- Selected ID: {self.id_str}")
             else:
-                self.print(F"WARN: {self.id_str} not found, use line count instead")
+                self.print(F"[WARN] {self.id_str} not found, use line count instead")
                 self.count_bool = True
-                self.print(F"Selected ID: line count")
+                self.print(F"- Selected ID: line count")
         if self.count_bool:
             self.id_dict.update({i:i for i in range(len(self.content_list))})
         else:
             self.id_dict.update({i:self.content_list[i][determind_int] for i in range(len(self.content_list))})
+        self.print("[ANALYSIS] finish")
     def conversion(self):
+        self.print("[CONVERSION] start")
         self.output_dict.update({id_str:{self.header_list[j]:k for j,k in enumerate(self.content_list[i])} for i,id_str in self.id_dict.items()})
+        self.print("[CONVERSION] finish")
+        output_size_int = sys.getsizeof(self.output_dict)
+        self.print("- Filesize: \"{}\"".format(self.convert_size(output_size_int)))
     def extractAttribute(self,attribute_str):
+        self.print("[Extract Attribute] start")
         temp_dict = dict()
         for key_str, value_dict in self.output_dict.items():
             temp_value_dict = dict()
@@ -109,6 +118,9 @@ class jsonizeTSV:
             temp_value_dict.update(attribute_dict)
             temp_dict[key_str] = temp_value_dict
         self.output_dict.update(temp_dict)
+        self.print("[Extract Attribute] finish")
+        output_size_int = sys.getsizeof(self.output_dict)
+        self.print("- Filesize: \"{}\"".format(self.convert_size(output_size_int)))
 
 if __name__ == "__main__":
     import json, argparse
