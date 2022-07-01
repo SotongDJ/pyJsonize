@@ -8,8 +8,10 @@ class jsonizeTSV:
         self.id_dict = dict()
         self.count_bool = False
         self.output_dict = dict()
+        self.mute = False
     def print(self,*args, **kwargs):
-        print(*args, **kwargs)
+        if not self.mute:
+            print(*args, **kwargs)
     # convert_size(), from: https://gist.github.com/SotongDJ/1296bbeedc5f49573c014a8e65dd707f
     def convert_size(self,size_bytes):
         if size_bytes == 0:
