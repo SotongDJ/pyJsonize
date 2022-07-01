@@ -1,3 +1,4 @@
+import os, sys, math
 class jsonizeTSV:
     def __init__(self):
         self.input_path = str()
@@ -9,6 +10,15 @@ class jsonizeTSV:
         self.output_dict = dict()
     def print(self,*args, **kwargs):
         print(*args, **kwargs)
+    # convert_size(), from: https://gist.github.com/SotongDJ/1296bbeedc5f49573c014a8e65dd707f
+    def convert_size(self,size_bytes):
+        if size_bytes == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes / p, 2)
+        return "{} {}".format(s, size_name[i])
     def deduplicate(self,input_list,output_dict_bool=False):
         duplicate_list = list()
         self.content_list = list()
