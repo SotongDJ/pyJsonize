@@ -155,4 +155,6 @@ if __name__ == "__main__":
             with open(output_str,'w') as output_handle:
                 json.dump(JsonizeTSV.output_dict,output_handle,indent=1)
         else:
-            JsonizeTSV.print("ERROR: Can't read(), EXIT")
+            JsonizeTSV.print("ERROR: output_dict is empty, EXIT")
+    else:
+        JsonizeTSV.print("ERROR: Can't read(), EXIT")
