@@ -8,7 +8,7 @@ class jsonizMeme:
     def errPrint(self,*args, **kwargs):
         print(*args, file=sys.stderr, **kwargs)
     def grab(self,target_path):
-        meme = open(target_path).read().replace("\n\n\n","\n\n").replace("\t", "").split("MOTIF ")
+        meme = open(target_path).read().replace("\n\n\n","\n\n").replace("\t", " ").replace("  ", " ").split("MOTIF ")
         self.header = meme[0]
         if "#header" not in self.meme_dict.keys():
             self.meme_dict["#header"] = self.header
