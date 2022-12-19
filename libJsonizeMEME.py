@@ -32,7 +32,7 @@ class jsonizMeme:
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser("Merge meme files or convert meme file, support MEME format (input and output) and json (output)")
+    parser = argparse.ArgumentParser(description="Merge meme files or convert meme file, support MEME format (input and output) and json (output)")
     parser.add_argument("-o", "--meme", type=str, help="output file (meme format)")
     parser.add_argument("-j", "--json", type=str, help="output file (json format)")
     parser.add_argument("file", type=str, nargs="+", help="meme files")
